@@ -1,12 +1,11 @@
 ---
-title: "Thoughts on Random"
-author: "Frank Jung"
-email: "frank.jung@marlo.com.au"
+title: 'Thoughts on Random Number Generators'
+author: '[frank.jung@marlo.com.au](mailto:frank.jung@marlo.com.au)'
 date: '`r format(Sys.time(), format="%d %b %Y")`'
 output:
-  html_document: default
-  pdf_document: default
   word_document: default
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE, echo=FALSE, message=FALSE, warning=FALSE}
@@ -18,29 +17,29 @@ require(randtests)
 ```
 
 One of the first exercises given to me as a student was to write a random number
-generator. This turned out not to be so easy. Now, we have a multitude of
-functions that will give us pseudorandom numbers. So now they are easy to
-generate. But where are random numbers used? As a developer, we see them mainly
-being used by testers. Recently, however we've seen them appear in more and
-more places. Now it seems they are everywhere! Random values are used to
-generate unique correlation id's in messages, to generate message payloads of
-arbitrary size, for file or directory names. Now they can be used for code
-testing and in model simulation.
+generator. This turned out to be not so easy. Nowadays, we have a multitude of
+functions that will give us pseudorandom numbers, making them easy to generate.
+But where are random numbers used? As a developer, we see them mainly being used
+by testers. Recently, however we've seen them appear in more and more places -
+it seems they are everywhere! Random values are used to generate unique
+correlation id's in messages, to generate message payloads of arbitrary size,
+for file or directory names. Now they can be used for code testing and in model
+simulation.
 
-In this first article we explore some techniques to generate random numbers
-using tools that can be easily invoked from
-[Bash](https://linux.die.net/man/1/bash). Then we will look at tests to see how
-random these numbers actually are!
+In this first article we explore some random numbers generators (RNG) that can
+be easily invoked from [Bash](https://linux.die.net/man/1/bash). To help compare
+each RNG, the random numbers have been [scaled from 0 to
+1](https://en.wikipedia.org/wiki/Feature_scaling). Then we will look at tests to
+see how random these numbers actually are!
 
 In future articles we will take a closer look at random values used in testing
 functions and how they are invaluable in model simulation.
 
-But, first lets look at some random number generators (RNG) that can be used in
-Bash.
+But first lets look at some random number generators that can be used in Bash.
 
-## Bash - $RANDOM
+## $RANDOM from Bash
 
-In Bash, the shell variable, `$RANDOM` is probably the easiest to use. It will
+In Bash the shell variable `$RANDOM` is probably the easiest to use. It will
 generate a number between 0 and 32767.
 
 For example:
@@ -53,7 +52,7 @@ $ RANDOM=123; echo $RANDOM
 Here, we have seeded `RANDOM` with a value. Seeding a random variable is
 required for reproducible results.
 
-To generate a random integer between START and END, you can use:
+To generate a random integer between `START` and `END` use:
 
 ```bash
 echo $(( (RANDOM % END) + START ))
@@ -84,7 +83,7 @@ package. There are many of tests in this package. The one we will use here is
 [Bartels Rank
 Test](https://www.rdocumentation.org/packages/randtests/versions/1.0/topics/bartels.rank.test).
 
-Here we are testing for randomness, though the test can also we to test for
+Here we are testing for randomness, though the test can also be used to test for
 trends or systematic oscillation.
 
 We will generate a list of 100 random decimal numbers between 0 and 1 using:
@@ -106,14 +105,19 @@ brtxt <- readLines(con <- file('/home/frank/dev/gnur/random/bash-random.num'))
 close(con)
 brnum <- as.numeric(brtxt)
 bartels.rank.test(brnum, 'two.sided', pvalue = 'auto')
-hist(brnum, col = 'purple', main = 'Bash $RANDOM', xlab = '$RANDOM/32767')
+```
+
+The histrogram of the normalised random numbers *n* is:
+
+```{r brhist, echo=FALSE, message=FALSE, warning=FALSE}
+hist(brnum, col = 'purple', main = 'Bash $RANDOM', xlab = '$RANDOM (n/32767)')
 ```
 
 So, Bash `$RANDOM` is probably random. This is generally good enough for basic
 requirements, but probably not suitable for more demanding use cases. So, how
 does [Awk](https://www.gnu.org/software/gawk/)'s `rand` fair?
 
-## Awk rand
+## rand from Awk
 
 Here we are using `rand` function from [GNU
 Awk](https://www.gnu.org/software/gawk/) This function generates random numbers
@@ -125,7 +129,7 @@ echo | awk -e 'BEGIN {srand()} {print rand();}'
 
 If you don't specify the seed `srand()`, then it will return the same results.
 
-You can also generate random integers between START and END.
+You can also generate random integers between `START` and `END`.
 
 For example, to simulate 10 rolls of a 6 sided dice:
 
@@ -139,7 +143,7 @@ To prepare the test data:
 seq 100 | awk -e 'BEGIN {srand()} {print rand();}' > awk-rand.num
 ```
 
-Again, Bartels Rank Test suggests that Awks `rand` rejects (p-value > 0.05) the
+Again, Bartels Rank Test suggests that Awk's `rand` rejects (p-value > 0.05) the
 alternative hypothesis that the sequence produced by the function is non-random:
 
 ```{r awk, echo=FALSE}
@@ -147,11 +151,16 @@ artxt <- readLines(con <- file('/home/frank/dev/gnur/random/awk-rand.num'))
 close(con)
 arnum <- as.numeric(artxt)
 bartels.rank.test(arnum, 'two.sided', pvalue = 'auto')
-hist(arnum, col = 'purple', main = 'Awk rand()', xlab = 'rand')
+```
+
+The histrogram of the random numbers *n* is:
+
+```{r arhist, echo=FALSE, message=FALSE, warning=FALSE}
+hist(arnum, col = 'purple', main = 'Awk rand()', xlab = 'rand (n)')
 ```
 
 
-## urandom
+## urandom device
 
 The final tool we will look at is the
 [/dev/urandom](https://www.systutorials.com/docs/linux/man/4-urandom/) device.
@@ -181,7 +190,7 @@ $ seq 5 | xargs -I -- od -vAn -N4 -tx4 /dev/urandom
   310001c4
 ```
 
-Or it can generate a block of 64 bytes of random alpha-numerics:
+Or it can generate a block of 64 random alphanumeric bytes using:
 
 ```bash
 $ cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 5
@@ -207,7 +216,12 @@ urtxt <- readLines(con <- file('/home/frank/dev/gnur/random/urandom.num'))
 close(con)
 urnum <- as.numeric(urtxt)
 bartels.rank.test(urnum, 'two.sided', pvalue = 'auto')
-hist(urnum, col = 'purple', main = 'urandom device', xlab = 'urandom')
+```
+
+The histrogram of the normalised random numbers *n* is:
+
+```{r urhist, echo=FALSE, message=FALSE, warning=FALSE}
+hist(urnum, col = 'purple', main = 'urandom device', xlab = 'urandom (n/100)')
 ```
 
 Of the tools explored, `urandom` is the most versatile. So it has broader
@@ -215,6 +229,6 @@ application. The down side is, its results are not
 [reproducible](https://en.wikipedia.org/wiki/Reproducibility). This is important
 for a reseach and for reproduction of tests.
 
-In the next article we will explore how random data can be used in testing code.
+*Stay tuned for part two to discover how random data can be used in testing code.*
 
 Code for this article can be found [here](https://github.com/frankhjung/random).
