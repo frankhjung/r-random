@@ -1,22 +1,22 @@
 #!/usr/bin/make
 
 .PHONY: all clean
-.SUFFIXES: .Rmd .html
+.SUFFIXES: .Rmd .pdf
 
 R	= /usr/bin/R
 DOC	= random
 RMD	:= $(patsubst %, %.Rmd, $(DOC))
-HTML	:= $(patsubst %.Rmd, %.html, $(RMD))
+PDF	:= $(patsubst %.Rmd, %.pdf, $(RMD))
 
-.Rmd.html:
+.Rmd.pdf:
 	@$(R) --quiet --slave --vanilla --file=make.R --args $<
 
-$(HTML): $(RMD)
+$(PDF): $(RMD)
 
-all: clean $(HTML)
+all: clean $(PDF)
 
 clean:
-	@$(RM) $(HTML)
+	@$(RM) $(PDF)
 
 cleanall: clean
 	@$(RM) -rf cache figure

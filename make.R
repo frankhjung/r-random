@@ -16,7 +16,7 @@ if (length(args) == 0) {
     for (rmd in commandArgs(trailingOnly = TRUE)) {
         # render Rmd to PDF
         if ( grepl("\\.Rmd$", rmd) && file.exists(rmd)) {
-            render(rmd, html_document())
+            render(rmd, pdf_document())
         } else {
             print(paste("Ignoring: ", rmd))
         }
