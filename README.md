@@ -1,7 +1,11 @@
-## Thoughts on Random Number Generators
+# Thoughts on Random Number Generators
 
-The document [random.Rmd](./random.Rmd) is RMarkdown that was used to generate
-the blog article. It contains all code use to generate the example data.
+1. [Random Number Generators in bash scripts](./random.Rmd)
+2. [Random Number Generators to test code](./code.Rmd) - TODO
+3. [Random Number Generators in simulation](./simulate.Rmd) - TODO
+
+The documents are written in RMarkdown. It contains all code used to generate
+the examples and plots.
 
 To generate document from [RMarkdown](https://rmarkdown.rstudio.com/) use:
 
@@ -10,20 +14,39 @@ library(rmarkdown)
 render("random.Rmd", output_format = "html_document")
 ```
 
-This can be also be done using the supplied Makefile:
+The PDF can be built using the supplied Makefile:
 
 ```bash
-make random.html
+make random.pdf
 ```
+
+## Publishing
+
+To publish to RPubs:
+
+```r
+library(knitr)
+knit_with_parameters('~/dev/gnur/random/random.Rmd')
+
+library(markdown)
+rpubsUpload("Thoughts on Random Number Generators", "random.html")
+```
+
+Published as http://rpubs.com/frankjungdss/random-bash
 
 ## References
 
-* [How do I measure the randomness of a sequence?](https://www.quora.com/How-do-I-measure-the-randomness-of-a-sequence)
+* [How do I measure the randomness of a
+sequence?](https://www.quora.com/How-do-I-measure-the-randomness-of-a-sequence)
+* [randtests](https://cran.r-project.org/web/packages/randtests/randtests.pdf)
+  package
+* [The Rank Version of von Neumann's Ratio Test for Randomness](https://www.researchgate.net/publication/230639951_The_Rank_Version_of_von_Neumann's_Ratio_Test_for_Randomness)
+* [QuickCheck: A Lightweight Tool for Random Testing of Haskell
+Programs](https://www.researchgate.net/publication/2449938_QuickCheck_A_Lightweight_Tool_for_Random_Testing_of_Haskell_Programs)
 
 ### Versions
 
 The versions of software used for this article are:
-
 
   | Command   | Version                             |
   | ---       | ---                                 |
@@ -38,3 +61,11 @@ The versions of software used for this article are:
   | RStudio   | 1.1.463                             |
   | seq       | seq (GNU coreutils) 8.30            |
   | tr        | (GNU coreutils) 8.30                |
+  
+Built on Operating System:
+
+  | Detail  | Version                     |
+  | ---     | ---                         |
+  | Distro  | Debian GNU/Linux buster/sid |
+  | Kernel  | 4.18.0-3-amd64 x86_64)      |
+  

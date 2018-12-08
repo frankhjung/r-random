@@ -1,6 +1,6 @@
 #!/usr/bin/make
 
-.PHONY: all clean
+.PHONY: all clean cleanall
 .SUFFIXES: .Rmd .pdf
 
 R	= /usr/bin/R
@@ -16,7 +16,7 @@ $(PDF): $(RMD)
 all: clean $(PDF)
 
 clean:
-	@$(RM) $(PDF)
+	@$(RM) *.random test.* *.zip temp.random.*
 
 cleanall: clean
-	@$(RM) -rf cache figure
+	@$(RM) -rf cache figure $(PDF) $(DOC).html

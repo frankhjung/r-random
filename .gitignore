@@ -1,12 +1,12 @@
 cache/
 *.docx
 figure/
-*.html
 *.lyx
-*.pdf
 .RData
 *.rds
 .Rhistory
 .Rproj.user
 *.tex
 *.zip
+notebook.nb.html
+random.pdf

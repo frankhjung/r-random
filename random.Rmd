@@ -5,7 +5,6 @@ date: '`r format(Sys.time(), format="%d %b %Y")`'
 output:
   html_document: default
   pdf_document: default
-  word_document: default
 ---
 
 ```{r setup, include=FALSE, echo=FALSE, message=FALSE, warning=FALSE}
@@ -124,9 +123,9 @@ pseudorandom signed 16-bit integer between 0 and 32767.
 
 `RANDOM` is easy to use is bash:
 
-```bash
-$ RANDOM=123; echo $RANDOM
-2877
+```{bash bashrandom}
+RANDOM=314
+echo $RANDOM
 ```
 
 Here, we have seeded `RANDOM` with a value. Seeding a random variable will
@@ -144,36 +143,33 @@ Where `START` < `END` are non-negative numbers.
 
 For example, to simulate 10 rolls of a 6 sided dice:
 
-```bash
-RANDOM=123 # an optional seed
+```{bash bashrange}
 START=1
 END=6
 RANGE=$(( END - START + 1 ))
 
-for (( i=0; i<10; i++))
-do
+RANDOM=314
+for i in $(seq 10); do
    echo -n $(( (RANDOM % RANGE) + START )) " "
 done
-```
-
-Which yields:
-
-```text
-  4  4  4  5  2  3  2  6  3  2
 ```
 
 #### Checking Sequences from RANDOM
 
 Prepare the test data:
 
-```bash
-RANDOM=123
+```{bash bashpreparedata}
+RANDOM=314
+# bc interferes with RANDOM
+temprandom=$(mktemp temp.random.XXXXXX)
 for i in $(seq 1000); do
-   printf "%0.2f\n" $(bc <<< "scale=2; $RANDOM/32768"); 
-done > ./bash.random
+   echo "scale=2;$RANDOM/32768"
+done > $temprandom
+cat $temprandom | bc | awk '{printf "%0.2f\n", $0}' > bash.random
+rm $temprandom
 ```
 
-```{r brload}
+```{r bashload}
 bashText <- readLines(con <- file(paste0(getwd(), '/bash.random')))
 close(con)
 bashRandom <- as.numeric(bashText)
@@ -181,22 +177,22 @@ bashRandom <- as.numeric(bashText)
 
 Show first 10 values:
 
-```{r brhead}
+```{r bashhead}
 head(bashRandom, n = 10)
 ```
 
 Plot the sequence vs value from RNG:
 
-```{r brplot}
-plot(x = seq(1,1000), y = bashRandom, 
+```{r bashplot}
+plot(x = seq(1000), y = bashRandom, 
      xlab = 'sequence', ylab = 'RANDOM', 
      title('bash RANDOM'), 
-     pch = 20, cex = 0.3, col = 'purple')
+     pch = 20, cex = 0.4, col = 'purple')
 ```
 
 Run Bartels Rank test:
 
-```{r brtest}
+```{r bashtest}
 bartels.rank.test(bashRandom, 'two.sided', pvalue = 'beta')
 ```
 
@@ -212,10 +208,10 @@ Here we are using `rand` function from [GNU
 Awk](https://www.gnu.org/software/gawk/). This function generates random numbers
 between 0 and 1.
 
-```bash
-# seeded with 123
-$ echo | awk -e 'BEGIN {srand(123)} {print rand();}'
-0.517322
+Example where `rand()` seeded
+
+```{bash awkrand}
+echo | awk -e 'BEGIN {srand(314)} {print rand();}'
 ```
 
 If you don't specify a seed in `srand()` it will return the same results.
@@ -224,20 +220,19 @@ You can also generate random integers in a range.
 
 For example, to simulate 10 rolls of a 6 sided dice:
 
-```bash
-$ echo | awk 'BEGIN {srand(123)} {for (i=0; i<10; i++) printf("%d ", int(6*rand()+1));}'
-4 4 6 3 2 4 1 6 2 6
+```{bash awkrange}
+echo | awk 'BEGIN {srand(314)} {for (i=0; i<10; i++) printf("%d ", int(rand()*6+1));}'
 ```
 
 #### Checking Sequences from rand()
 
 Prepare the test data:
 
-```bash
-seq 1000 | awk -e 'BEGIN {srand(123)} {printf("%0.2f\n",rand());}' > awk.random
+```{bash awkpreparedata}
+seq 1000 | awk -e 'BEGIN {srand(314)} {printf("%0.2f\n",rand());}' > awk.random
 ```
 
-```{r arload}
+```{r awkload}
 awkText <- readLines(con <- file(paste0(getwd(), '/awk.random')))
 close(con)
 awkRandom <- as.numeric(awkText)
@@ -245,22 +240,22 @@ awkRandom <- as.numeric(awkText)
 
 Show first 10 values:
 
-```{r arhead}
+```{r awkhead}
 head(awkRandom, n = 10)
 ```
 
 Plot the sequence vs value from RNG:
 
-```{r arplot}
-plot(x = seq(1,1000), y = awkRandom, 
+```{r awkplot}
+plot(x = seq(1000), y = awkRandom, 
      xlab = 'sequence', ylab = 'rand()', 
      title('awk rand()'), 
-     pch = 20, cex = 0.3, col = 'purple')
+     pch = 20, cex = 0.4, col = 'purple')
 ```
 
 Run Bartels Rank test:
 
-```{r artest}
+```{r awktest}
 bartels.rank.test(awkRandom, 'two.sided', pvalue = 'beta')
 ```
 
@@ -280,47 +275,31 @@ a useful tool as it can generate a wide variety of data types.
 For example print a list of unsigned decimal using
 [od(1)](http://man7.org/linux/man-pages/man1/od.1.html):
 
-```bash
-$ seq 5 | xargs -I -- od -vAn -N4 -tu4 /dev/urandom
- 3287622437
- 3753974622
- 2103329150
- 1495823055
- 2218999858
+```{bash urandomdec}
+seq 5 | xargs -I -- od -vAn -N4 -tu4 /dev/urandom
 ```
 
 It can also be used to source random hexadecimal values:
 
-```bash
-$ seq 5 | xargs -I -- od -vAn -N4 -tx4 /dev/urandom
-  e480673d
-  bc9f1aa8
-  4ece5c41
-  cba1e97c
-  310001c4
+```{bash urandomhex}
+seq 5 | xargs -I -- od -vAn -N4 -tx4 /dev/urandom
 ```
 
 Or it can generate a block of 64 random alphanumeric bytes using:
 
-```bash
-$ cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 5
-  6mBG7HU2KxwBmRR2CNkEwe2CpxOzuKpGqfUK98GqrthpVQTVTMbSIFKWF6UbXWv2
-  vx6IxPHiTW1VaJZgmzug6kmuXP9dOZYMLSKKNYmLoZEc4gcZdoqUrxmIkoagjPcc
-  FZHqk0RrNnUMVUOeX5IQGwtX6mfDRtUEAuBYFGIJi61RQ3ISdnta7Dk9gTymYpXo
-  ggThurP1Q51k4K0Mi1YApgKYqb9qdNiSWQejMJBI00PuOfQhJeOsUZQrNEekeCEN
-  ETLFeRanuBBjVpr0Bm5lcjezn8eyuzNQjM9scgRK2BziIMlQwtkUA4T3MZAUZFk6
+```{bash urandomblock}
+cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 5
 ```
 
 #### Checking Sequences from urandom
 
 Prepare the test data:
 
-```bash
-cat /dev/urandom | tr -dc  '0-9' | fold -w2 | \
-   awk '{printf("0.%02d\n",$1)}' | head -1000 > urandom.random
+```{bash urandompreparedata}
+cat /dev/urandom | tr -dc  '0-9' | fold -w2 | awk '{printf("0.%02d\n",$1)}' | head -1000 > urandom.random
 ```
 
-```{r urload}
+```{r urandomload}
 urText <- readLines(con <- file(paste0(getwd(), '/urandom.random')))
 close(con)
 urRandom <- as.numeric(urText)
@@ -328,22 +307,22 @@ urRandom <- as.numeric(urText)
 
 Show first 10 values:
 
-```{r urhead}
+```{r urandomhead}
 head(urRandom, n = 10)
 ```
 
 Plot the sequence vs value from RNG:
 
-```{r urplot}
-plot(x = seq(1,1000), y = urRandom, 
+```{r urandomplot}
+plot(x = seq(1000), y = urRandom, 
      xlab = 'sequence', ylab = 'urandom', 
      title('/dev/urandom'), 
-     pch = 20, cex = 0.3, col = 'purple')
+     pch = 20, cex = 0.4, col = 'purple')
 ```
 
 Run Bartels Rank test:
 
-```{r urtest}
+```{r urandomtest}
 bartels.rank.test(urRandom, 'two.sided', pvalue = 'beta')
 ```
 
@@ -387,38 +366,28 @@ answer in one direction.
 In light of this knowledge, lets run the compression tests for the sequences
 above:
 
-```bash
-$ ls -l *.random
--rw-r--r-- 1 frank frank 5000 2018-12-06 14:57 awk.random
--rw-r--r-- 1 frank frank 5000 2018-12-06 14:57 bash.random
--rw-r--r-- 1 frank frank 5000 2018-12-06 14:59 urandom.random
+```{bash list}
+ls -l *.random
 ```
 
 Compress using [zip](https://linux.die.net/man/1/zip):
 
-```bash
-$ for z in 'awk' 'bash' 'urandom'; do zip $z $z.random; done
-  adding: awk.random (deflated 72%)
-  adding: bash.random (deflated 72%)
-  adding: urandom.random (deflated 72%)
+```{bash zip}
+for z in *.random; do zip ${z%%.random} $z; done
 ```
 
 Compare this to non-random (trend) data:
 
-```bash
-$ for i in $(seq 1000); do printf "0.%02d\n" $(( i % 100 )) ; done > test.nonrandom
-
-$ zip test test.nonrandom 
-  adding: test.nonrandom (deflated 96%)
+```{bash testnonrandom}
+for i in $(seq 1000); do printf "0.%02d\n" $(( i % 100 )) ; done > test.trend
+zip trend test.trend 
 ```
 
 Or just constant data:
 
-```bash
-$ for i in $(seq 1000); do echo 0.00 ; done > test.constant
-
-$ zip constant test.constant 
-  adding: test.constant (deflated 99%)
+```{bash testconstant}
+for i in $(seq 1000); do echo 0.00 ; done > test.constant
+zip constant test.constant 
 ```
 
 So zipping is a good, if rough, proxy for a measure of randomness.
