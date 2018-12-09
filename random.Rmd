@@ -221,7 +221,7 @@ You can also generate random integers in a range.
 For example, to simulate 10 rolls of a 6 sided dice:
 
 ```{bash awkrange}
-echo | awk 'BEGIN {srand(314)} {for (i=0; i<10; i++) printf("%d ", int(rand()*6+1));}'
+echo | awk 'BEGIN {srand(314)} {for (i=0; i<10; i++) printf("%d ", int(rand() * 6 + 1));}'
 ```
 
 #### Checking Sequences from rand()
@@ -296,7 +296,8 @@ cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 5
 Prepare the test data:
 
 ```{bash urandompreparedata}
-cat /dev/urandom | tr -dc  '0-9' | fold -w2 | awk '{printf("0.%02d\n",$1)}' | head -1000 > urandom.random
+cat /dev/urandom | tr -dc  '0-9' | fold -w2 | \
+	awk '{printf("0.%02d\n",$1)}' | head -1000 > urandom.random
 ```
 
 ```{r urandomload}

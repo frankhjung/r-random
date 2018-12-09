@@ -1,24 +1,22 @@
 #!/usr/bin/env R
 
-# Render R markdown (Rmd) to HTML.
+# Render R markdown (Rmd) to HTML or PDF.
+#
 # Usage:
-#   R -q -f make.R --args [file.Rmd] ...
-#   R --quiet --slave --vanilla --file=make.R --args [file.Rmd] ...
+#   R -q -f make.R --args [file.(html|pdf)] ...
+#   R --quiet --slave --vanilla --file=make.R --args [file.(html|pdf)] ...
 
 # load packages
 require(rmarkdown)
 
 # require a parameter naming file to render
-if (length(args) == 0) {
-    stop("Error: missing file operand", call. = TRUE)
-} else {
-    # read report to render from command line
-    for (rmd in commandArgs(trailingOnly = TRUE)) {
-        # render Rmd to PDF
-        if ( grepl("\\.Rmd$", rmd) && file.exists(rmd)) {
-            render(rmd, pdf_document())
-        } else {
-            print(paste("Ignoring: ", rmd))
-        }
+args = commandArgs(trailingOnly=TRUE)
+if (length(args) == 1) {
+    if (endsWith(args[1], 'html')) {
+        render(gsub('html$', 'Rmd', args[1]), html_document())
+    } else if(endsWith(args[1], 'pdf')) {
+        render(gsub('pdf$', 'Rmd', args[1]), pdf_document())
     }
+} else {
+    stop("ERROR: too many operands", call. = TRUE)
 }

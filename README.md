@@ -37,12 +37,13 @@ Published as http://rpubs.com/frankjungdss/random-bash
 ## References
 
 * [How do I measure the randomness of a
-sequence?](https://www.quora.com/How-do-I-measure-the-randomness-of-a-sequence)
+sequence? (Roth)](https://www.quora.com/How-do-I-measure-the-randomness-of-a-sequence)
 * [randtests](https://cran.r-project.org/web/packages/randtests/randtests.pdf)
   package
-* [The Rank Version of von Neumann's Ratio Test for Randomness](https://www.researchgate.net/publication/230639951_The_Rank_Version_of_von_Neumann's_Ratio_Test_for_Randomness)
+* [The Rank Version of von Neumann's Ratio Test for Randomness (Bartels)](https://www.researchgate.net/publication/230639951_The_Rank_Version_of_von_Neumann's_Ratio_Test_for_Randomness)
+* [Nonparametric Tests for Randomness (Wang)](http://www.ifp.illinois.edu/~ywang11/paper/ECE461Proj.pdf)
 * [QuickCheck: A Lightweight Tool for Random Testing of Haskell
-Programs](https://www.researchgate.net/publication/2449938_QuickCheck_A_Lightweight_Tool_for_Random_Testing_of_Haskell_Programs)
+Programs (Claessen, Hughes) ](https://www.researchgate.net/publication/2449938_QuickCheck_A_Lightweight_Tool_for_Random_Testing_of_Haskell_Programs)
 
 ### Versions
 
