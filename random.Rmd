@@ -1,5 +1,5 @@
 ---
-title: 'Thoughts on Random Number Generators'
+title: 'Thoughts on RNG - Bash Scripting'
 author: '[frank.jung@marlo.com.au](mailto:frank.jung@marlo.com.au)'
 date: '`r format(Sys.time(), format="%d %b %Y")`'
 output:
@@ -10,6 +10,8 @@ output:
 ```{r setup, include=FALSE, echo=FALSE, message=FALSE, warning=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 require(randtests)
+require(ggplot2)
+require(lubridate)
 ```
 
 One of the first exercises given to me as a mathematics student was to write a
@@ -36,7 +38,7 @@ The three RNG's being evaluated here are:
 * [Awk](https://linux.die.net/man/1/awk) `rand()` function
 * [/dev/urandom](https://linux.die.net/man/4/urandom) device
 
-**Words of caution:** 
+**Words of caution:**
 
 None of these tools are suitable for generating passwords or for cryptography.
 
@@ -75,11 +77,13 @@ package,
 Annual data on total number of tourists to the United States for 1970-1982.
 
 ```{r example1}
-years <- 1970:1982
+years <- seq(ymd('1970-01-01'), ymd('1982-01-01'), by = 'years')
 tourists <- c(12362, 12739, 13057, 13955, 14123, 15698, 17523, 18610, 19842,
 20310, 22500, 23080, 21916)
-# plot(years, tourists, pch = 20, col = 'purple')
-plot(years, tourists, col = 'purple')
+qplot(years, tourists, colour = I('purple')) +
+   ggtitle('Tourists to United States (1970-1982)') +
+   theme(plot.title = element_text(hjust = 0.5)) +
+   scale_x_date()
 bartels.rank.test(tourists, alternative = "left.sided", pvalue = "beta")
 ```
 
@@ -89,17 +93,21 @@ hypothesis, that of a trend.
 
 ### Example in Bartels (1982)
 
-Changes in stock levels for 1968-1969 to 1977-1978 (in $AUD million), deflated
+Changes in stock levels for 1968-1969 to 1977-1978 (in AUD million), deflated
 by the Australian gross domestic product (GDP) price index (base 1966-1967).
 [Source](https://www.researchgate.net/publication/230639951_The_Rank_Version_of_von_Neumann's_Ratio_Test_for_Randomness)
 
 ```{r example2}
-y <- c(528, 348, 264, -20, -167, 575, 410, -4, 430, -122)
-x1 <- 1968:1977
-x2 <- 1969:1978
-df <- data.frame(period = paste(sep = '-', x1, x2), gdp = y, stringsAsFactors = TRUE)
-plot(df, xlab = 'Financial Year', ylab = 'GDP ($AUD million)')
-bartels.rank.test(y, pvalue = 'beta')
+gdp <- c(528, 348, 264, -20, -167, 575, 410, -4, 430, -122)
+df <- data.frame(period = paste(sep = '-', 1968:1977, 1969:1978), gdp = gdp, stringsAsFactors = TRUE)
+ggplot(data = df, aes(period, gdp)) +
+   geom_point(colour = I('purple')) +
+   ggtitle('Australian Deflated Stock Levels') +
+   theme(plot.title = element_text(hjust = 0.5)) +
+   xlab('Financial Year') +
+   theme(axis.text.x = element_text(angle = 90)) +
+   ylab('GDP (AUD million)')
+bartels.rank.test(gdp, pvalue = 'beta')
 ```
 
 Here, the sampled data provides weak evidence against the null hypothesis of
@@ -156,6 +164,10 @@ done
 
 #### Checking Sequences from RANDOM
 
+The following code will generate a random sample using bash RANDOM.  The sample
+will be scaled to 1.  The generated sample will then be tested using Bartels
+Rank test, where the null hypothsis is that the sequence is random.
+
 Prepare the test data:
 
 ```{bash bashpreparedata}
@@ -181,13 +193,14 @@ Show first 10 values:
 head(bashRandom, n = 10)
 ```
 
-Plot the sequence vs value from RNG:
+Plot the sequence versus value from RNG:
 
 ```{r bashplot}
-plot(x = seq(1000), y = bashRandom, 
-     xlab = 'sequence', ylab = 'RANDOM', 
-     title('bash RANDOM'), 
-     pch = 20, cex = 0.4, col = 'purple')
+bashDF <- data.frame(sequence = seq(length(bashRandom)), RANDOM = bashRandom)
+ggplot(bashDF, aes(x = sequence, y = RANDOM)) +
+   geom_point(size = 0.5, colour = I('purple')) +
+   ggtitle('bash RANDOM') +
+   theme(plot.title = element_text(hjust = 0.5))
 ```
 
 Run Bartels Rank test:
@@ -201,12 +214,13 @@ bartels.rank.test(bashRandom, 'two.sided', pvalue = 'beta')
 With a p-value > 0.05 there is weak evidence against the null hypothesis of
 randomness.
 
-
 ### awk rand()
 
-Here we are using `rand` function from [GNU
-Awk](https://www.gnu.org/software/gawk/). This function generates random numbers
-between 0 and 1.
+The following code will generate a random sample using Here we are using `rand`
+function from [GNU Awk](https://www.gnu.org/software/gawk/). This function
+generates random numbers between 0 and 1. . The generated sample will then be
+tested using Bartels Rank test, where the null hypothsis is that the sequence is
+random.
 
 Example where `rand()` seeded
 
@@ -247,10 +261,11 @@ head(awkRandom, n = 10)
 Plot the sequence vs value from RNG:
 
 ```{r awkplot}
-plot(x = seq(1000), y = awkRandom, 
-     xlab = 'sequence', ylab = 'rand()', 
-     title('awk rand()'), 
-     pch = 20, cex = 0.4, col = 'purple')
+awkDF <- data.frame(sequence = seq(length(awkRandom)), rand = awkRandom)
+ggplot(awkDF, aes(x = sequence, y = rand)) +
+   geom_point(size = 0.5, colour = I('purple')) +
+   ggtitle('awk rand()') +
+   theme(plot.title = element_text(hjust = 0.5))
 ```
 
 Run Bartels Rank test:
@@ -263,7 +278,6 @@ bartels.rank.test(awkRandom, 'two.sided', pvalue = 'beta')
 
 With a p-value > 0.05 there is weak evidence against the null hypothesis of
 randomness.
-
 
 ### urandom device
 
@@ -293,6 +307,11 @@ cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 5
 
 #### Checking Sequences from urandom
 
+To create a test sample that is scaled to 1, we will sample two digits from
+urandom and use these as decimal values. The generated sample will then be
+tested using Bartels Rank test, where the null hypothsis is that the sequence is
+random.
+
 Prepare the test data:
 
 ```{bash urandompreparedata}
@@ -315,10 +334,11 @@ head(urRandom, n = 10)
 Plot the sequence vs value from RNG:
 
 ```{r urandomplot}
-plot(x = seq(1000), y = urRandom, 
-     xlab = 'sequence', ylab = 'urandom', 
-     title('/dev/urandom'), 
-     pch = 20, cex = 0.4, col = 'purple')
+urandomDF <- data.frame(sequence = seq(length(urRandom)), urandom = urRandom)
+ggplot(urandomDF, aes(x = sequence, y = urandom)) +
+   geom_point(size = 0.5, colour = I('purple')) +
+   ggtitle('/dev/urandom') +
+   theme(plot.title = element_text(hjust = 0.5))
 ```
 
 Run Bartels Rank test:
@@ -331,7 +351,6 @@ bartels.rank.test(urRandom, 'two.sided', pvalue = 'beta')
 
 With a p-value > 0.05 there is weak evidence against the null hypothesis of
 randomness.
-
 
 ## Some final thoughts
 
@@ -352,7 +371,7 @@ can still meaningfully talk about how "random" it is using Kolmogorov
 Complexity: (Kolmogorov complexity). Intuitively, a Kolmogorov random object is
 one that cannot be compressed. Sequences that are drawn from truly random
 sources are Kolmogorov random with extremely high probability.
-> 
+>
 > Unfortunately, it is not possible to compute the Kolmogorov complexity of
 sequences in general (it is an undecidable property of strings). However, you
 can still estimate it simply by trying to compress the sequence. Run it through
@@ -381,14 +400,14 @@ Compare this to non-random (trend) data:
 
 ```{bash testnonrandom}
 for i in $(seq 1000); do printf "0.%02d\n" $(( i % 100 )) ; done > test.trend
-zip trend test.trend 
+zip trend test.trend
 ```
 
 Or just constant data:
 
 ```{bash testconstant}
 for i in $(seq 1000); do echo 0.00 ; done > test.constant
-zip constant test.constant 
+zip constant test.constant
 ```
 
 So zipping is a good, if rough, proxy for a measure of randomness.
