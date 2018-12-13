@@ -74,6 +74,7 @@ The versions of software used for this article are:
   | knitr     | 1.20                                |
   | lubridate | 1.7.4                               |
   | od        | (GNU coreutils) 8.30                |
+  | R         | 3.5.1 (2018-07-02)                  |
   | randtests | 1.0                                 |
   | RStudio   | 1.1.463                             |
   | seq       | seq (GNU coreutils) 8.30            |
@@ -81,8 +82,8 @@ The versions of software used for this article are:
 
 Built on Operating System:
 
-  | Detail  | Version                     |
-  | ---     | ---                         |
-  | Distro  | Debian GNU/Linux buster/sid |
-  | Kernel  | 4.18.0-3-amd64 x86_64)      |
+  | Detail | Version                     |
+  | ---    | ---                         |
+  | Distro | Debian GNU/Linux buster/sid |
+  | Kernel | 4.18.0-3-amd64 x86_64)      |
 
