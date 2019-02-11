@@ -59,13 +59,13 @@ There are many tests that can be applied to sequences to check for randomness.
 Here we are only looking at one: the [Bartels Rank
 test](https://www.rdocumentation.org/packages/randtests/versions/1.0/topics/bartels.rank.test).
 It's limitations and those of other tests are described
-[here](http://www.ifp.illinois.edu/~ywang11/paper/ECE461Proj.pdf). I've choosen
+[here](http://www.ifp.illinois.edu/~ywang11/paper/ECE461Proj.pdf). I've chosen
 this test as it is relatively easy to understand and interpret. Rather than
 comparing the magnitude of each observation with its preceding sample, Bartels
 Rank test, ranks all the samples from the smallest to the largest. The rank is
 the corresponding sequential number in the list of possibilities. Under the null
 hypothesis of randomness, any rank arrangement from all possibilities should be
-equiprobable. Bartels Rank test is also [suitable for small
+equi-probable. Bartels Rank test is also [suitable for small
 samples](https://www.researchgate.net/publication/230639951_The_Rank_Version_of_von_Neumann's_Ratio_Test_for_Randomness).
 
 To get a feel of the test: consider two of the vignettes provided by the R
@@ -166,7 +166,7 @@ done
 
 The following code will generate a random sample using bash RANDOM.  The sample
 will be scaled to 1.  The generated sample will then be tested using Bartels
-Rank test, where the null hypothsis is that the sequence is random.
+Rank test, where the null hypothesis is that the sequence is random.
 
 Prepare the test data:
 
@@ -309,8 +309,8 @@ cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 64 | head -n 5
 
 To create a test sample that is scaled to 1, we will sample two digits from
 urandom and use these as decimal values. The generated sample will then be
-tested using Bartels Rank test, where the null hypothsis is that the sequence is
-random.
+tested using Bartels Rank test, where the null hypothesis is that the sequence
+is random.
 
 Prepare the test data:
 
@@ -362,7 +362,7 @@ been identified by a study by [Gutterman, Zvi; Pinkas, Benny; Reinman, Tzachy
 version 2.6.10.
 
 Personally, this has been a useful learning exercise. For one it showed the
-limitations in generating and testing for (psuedo)random sequences. Indeed,
+limitations in generating and testing for (pseudo)random sequences. Indeed,
 [Aaron Roth](https://www.quora.com/profile/Aaron-Roth), has
 [suggested](https://www.quora.com/How-do-I-measure-the-randomness-of-a-sequence):
 
