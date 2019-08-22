@@ -1,8 +1,8 @@
 # Thoughts on Random Number Generators
 
-1. [Random Number Generators in bash scripts](./random.Rmd)
-2. [Random Number Generators to test code](./code.Rmd) - (branch quickcheck)
-3. [Random Number Generators in simulation](./simulate.Rmd) - TODO
+1. [Random Number Generators in bash scripts](https://gitlab.com/theMarloGroup/articles/random)
+2. [Random Number Generators to test code](https://gitlab.com/theMarloGroup/articles/quickcheck)
+3. [Random Number Generators in simulation](https://gitlab.com/theMarloGroup/articles/simulation)
 
 
 ## Building
